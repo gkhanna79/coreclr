@@ -68,14 +68,14 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <DotnetToolCommand Condition="'$(DotnetToolCommand)'=='' and '$(OsEnvironment)'!='Unix'">$(DotnetCliPath)dotnet.exe</DotnetToolCommand>    
-    <DotnetToolCommand Condition="'$(DotnetToolCommand)'=='' and '$(OsEnvironment)'=='Unix'">$(DotnetCliPath)dotnet</DotnetToolCommand>    
+    <DotnetToolCommand Condition="'$(DotnetToolCommand)'=='' and '$(OsEnvironment)'=='Windows_NT'">$(DotnetCliPath)dotnet.exe</DotnetToolCommand>    
+    <DotnetToolCommand Condition="'$(DotnetToolCommand)'=='' and '$(OsEnvironment)'!='Windows_NT'">$(DotnetCliPath)dotnet</DotnetToolCommand>    
 
     <DnuRestoreSource>@(DnuSourceList -> '--source %(Identity)', ' ')</DnuRestoreSource>
     <DnuRestoreDirs>@(DnuRestoreDir -> '%(Identity)', ' ')</DnuRestoreDirs>
     
     <!-- If CORE_ROOT is set on Windows, the dotnet CLI tool tries to use it. This results in DLL resolution errors. Unset CORE_ROOT during restore. -->
-    <DnuRestoreCommand Condition="'$(OsEnvironment)'!='Unix'">(set CORE_ROOT=) &amp;</DnuRestoreCommand>
+    <DnuRestoreCommand Condition="'$(OsEnvironment)'=='Windows_NT'">(set CORE_ROOT=) &amp;</DnuRestoreCommand>
     
     <DnuRestoreCommand>$(DnuRestoreCommand) "$(DotnetToolCommand)"</DnuRestoreCommand>
     <DnuRestoreCommand>$(DnuRestoreCommand) restore</DnuRestoreCommand>

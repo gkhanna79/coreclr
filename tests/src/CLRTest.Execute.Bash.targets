@@ -230,10 +230,7 @@ CLRTestExitCode=$?
     <!-- Raise an error if any value in _RequiredProperties is missing  -->
     <Error Condition=" '%(_RequiredProperties.Value)'=='' "
       Text="Missing required test property [%(_RequiredProperties.Identity)]. Something isn't plumbed through correctly.  Contact $(_CLRTestBuildSystemOwner)." />
-      <!-- TODO: this is weird.  Consider eliminating it. -->
-    <GenerateParamList ArgumentItems="@(BashCLRTestExecutionScriptArgument)">
-      <Output TaskParameter="ParamList" PropertyName="_CLRTestParamList"/>
-    </GenerateParamList>
+      
     <PropertyGroup>
       <!--
       This generates the script portion to parse all of the command line arguments.
@@ -243,7 +240,6 @@ CLRTestExitCode=$?
       <BashCLRTestArgPrep><![CDATA[
 usage()
 {
-    echo "Usage: $0  $(_CLRTestParamList)"
     echo 
     echo "Arguments:"
 @(BashCLRTestExecutionScriptArgument -> '    echo "-%(Identity)=%(ParamName)"

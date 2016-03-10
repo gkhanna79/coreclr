@@ -95,15 +95,15 @@ This file contains the logic for providing Execution Script generation.
   Note also that this means it will run after the first of such targets.
   -->
   
-  <ItemGroup>
-    <ExecutionScriptKind Include="Batch" />
-    <ExecutionScriptKind Include="Bash" />
-  </ItemGroup>
-  
-  <Import Project="CLRTest.Execute.*.targets" />
+  <Import Project="CLRTest.Execute.Batch.targets" Condition="'$(OsEnvironment)' == 'Windows_NT'"/>
+  <Import Project="CLRTest.Execute.Bash.targets" Condition="'$(OsEnvironment)' != 'Windows_NT'"/>
   
   <Target Name="GenerateExecutionScriptsInternal"
-    Condition="$(_CLRTestNeedsToRun) or $(_CLRTestBuildsExecutable)"
-    DependsOnTargets="Generate@(ExecutionScriptKind, 'ExecutionScript;Generate')ExecutionScript;" />
+    Condition="'$(OsEnvironment)' == 'Windows_NT' and ($(_CLRTestNeedsToRun) or $(_CLRTestBuildsExecutable))"
+    DependsOnTargets="GenerateBatchExecutionScript" />
   
+  <Target Name="GenerateExecutionScriptsInternal"
+    Condition="'$(OsEnvironment)' != 'Windows_NT' and ($(_CLRTestNeedsToRun) or $(_CLRTestBuildsExecutable))"
+    DependsOnTargets="GenerateBashExecutionScript" />
+    
 </Project>

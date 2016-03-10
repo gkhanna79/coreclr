@@ -33,6 +33,12 @@
     <DefineConstants>$(DefineConstants);DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
 
+  <!-- Roslyn does not support writing PDBs on non-Windows -->
+  <PropertyGroup Condition="'$(OsEnvironment)' != 'Windows_NT'">
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+  
 <!-- Setup the default output and intermediate paths -->
   <PropertyGroup>
     <OSPlatformConfig>$(BuildOS).$(Platform).$(Configuration)</OSPlatformConfig>
