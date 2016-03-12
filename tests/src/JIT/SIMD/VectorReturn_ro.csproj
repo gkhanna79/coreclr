@@ -18,7 +18,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType Condition="'$(DebugInfoSupported)' == 'true'">pdbonly</DebugType>
     <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>

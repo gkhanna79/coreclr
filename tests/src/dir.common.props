@@ -34,9 +34,13 @@
   </PropertyGroup>
 
   <!-- Roslyn does not support writing PDBs on non-Windows -->
+  <PropertyGroup Condition="'$(OsEnvironment)' == 'Windows_NT'">
+    <DebugInfoSupported>true</DebugInfoSupported>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(OsEnvironment)' != 'Windows_NT'">
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
+    <DebugInfoSupported>false</DebugInfoSupported>
   </PropertyGroup>
   
 <!-- Setup the default output and intermediate paths -->

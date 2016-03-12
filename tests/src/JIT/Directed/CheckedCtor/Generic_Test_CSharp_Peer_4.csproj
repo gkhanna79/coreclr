@@ -27,7 +27,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <PropertyGroup>
-    <DebugType>Full</DebugType>
+    <DebugType Condition="'$(DebugInfoSupported)' == 'true'">Full</DebugType>
     <Optimize>False</Optimize>
   </PropertyGroup>
   <ItemGroup>

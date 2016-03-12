@@ -27,7 +27,7 @@
   </ItemGroup>
   <PropertyGroup>
     <!-- Set to 'Full' if the Debug? column is marked in the spreadsheet. Leave blank otherwise. -->
-    <DebugType>PdbOnly</DebugType>
+    <DebugType Condition="'$(DebugInfoSupported)' == 'true'">pdbonly</DebugType>
     <NoLogo>True</NoLogo>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <DefineConstants>$(DefineConstants);DESKTOP;LOCALLOC_DYNAMIC</DefineConstants>

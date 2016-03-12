@@ -30,7 +30,7 @@
   <PropertyGroup>
     <Optimize></Optimize>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <DebugType>Full</DebugType>
+    <DebugType Condition="'$(DebugInfoSupported)' == 'true'">full</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="loop2.cs" />

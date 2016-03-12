@@ -29,7 +29,7 @@
   </ItemGroup>
   <PropertyGroup>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <DebugType>Full</DebugType>
+    <DebugType Condition="'$(DebugInfoSupported)' == 'true'">full</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="expl_obj_1.cs" />

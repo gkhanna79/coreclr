@@ -27,7 +27,7 @@
   </ItemGroup>
   <PropertyGroup>
     <!-- Set to 'Full' if the Debug? column is marked in the spreadsheet. Leave blank otherwise. -->
-    <DebugType>Full</DebugType>
+    <DebugType Condition="'$(DebugInfoSupported)' == 'true'">full</DebugType>
     <Optimize></Optimize>
     <NoLogo>True</NoLogo>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>

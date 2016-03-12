@@ -27,7 +27,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <PropertyGroup>
-    <DebugType>PdbOnly</DebugType>
+    <DebugType Condition="'$(DebugInfoSupported)' == 'true'">PdbOnly</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="complex2.cs" />

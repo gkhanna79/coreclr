@@ -26,7 +26,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <PropertyGroup>
-    <DebugType>PdbOnly</DebugType>
+    <DebugType Condition="'$(DebugInfoSupported)' == 'true'">pdbonly</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="box-unbox-generics001.cs" />

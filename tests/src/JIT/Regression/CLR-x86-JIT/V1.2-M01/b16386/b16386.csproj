@@ -27,7 +27,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <PropertyGroup>
-    <DebugType>Full</DebugType>
+    <DebugType Condition="'$(DebugInfoSupported)' == 'true'">full</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="gtnop.cs" />
