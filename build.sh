@@ -50,6 +50,12 @@ setup_dirs()
     mkdir -p "$__BinDir"
     mkdir -p "$__LogsDir"
     mkdir -p "$__IntermediatesDir"
+
+    mkdir -p "$__TestRootDir"
+    mkdir -p "$__TestBinDir"
+    mkdir -p "$__TestIntermediateDir"
+    mkdir -p "$__NativeTestIntermediateDir"
+    mkdir -p "$__ManagedTestIntermediateDir"
 }
 
 # Performs "clean build" type actions (deleting and remaking directories)
@@ -60,9 +66,8 @@ clean()
     rm -rf "$__BinDir"
     rm -rf "$__IntermediatesDir"
 
-    rm -rf "$__TestWorkingDir"
-    rm -rf "$__TestIntermediatesDir"
-
+    rm -rf "$__TestRootDir"
+    
     rm -rf "$__LogsDir/*_$__BuildOS__$__BuildArch__$__BuildType.*"
 }
 
@@ -143,8 +148,8 @@ build_coreclr()
 
     if [ $__SkipConfigure == 0 ]; then
         # Regenerate the CMake solution
-        echo "Invoking \"$__ProjectRoot/src/pal/tools/gen-buildsys-clang.sh\" \"$__ProjectRoot\" $__ClangMajorVersion $__ClangMinorVersion $__BuildArch $__BuildType $__CodeCoverage $__IncludeTests $generator $__cmakeargs"
-        "$__ProjectRoot/src/pal/tools/gen-buildsys-clang.sh" "$__ProjectRoot" $__ClangMajorVersion $__ClangMinorVersion $__BuildArch $__BuildType $__CodeCoverage $__IncludeTests $generator "$__cmakeargs"
+        echo "Invoking \"$__ProjectRoot/src/pal/tools/gen-buildsys-clang.sh\" \"$__ProjectRoot\" $__ClangMajorVersion $__ClangMinorVersion $__BuildArch $__BuildType $__CodeCoverage $generator $__cmakeargs"
+        "$__ProjectRoot/src/pal/tools/gen-buildsys-clang.sh" "$__ProjectRoot" $__ClangMajorVersion $__ClangMinorVersion $__BuildArch $__BuildType $__CodeCoverage $generator "$__cmakeargs"
     fi
 
     if [ $__SkipCoreCLR == 1 ]; then
@@ -258,6 +263,59 @@ build_mscorlib()
            fi
        fi
     fi 
+}
+
+build_tests()
+{
+
+    # Move native binary generation here as well.
+
+    if [ $__isMSBuildOnNETCoreSupported == 0 ]; then
+        echo "Test build unsupported."
+        return
+    fi
+
+    # Skip the test build if we have been asked to do so.
+    if [ $__SkipTests == 1 ]; then
+        echo "Test build skipped."
+        return
+    fi
+
+    # Restore buildTools
+    restoreBuildTools
+
+    echo "Commencing Test build for $__BuildOS.$__BuildArch.$__BuildType"
+
+    # if [ $__SkipConfigure == 0 ]; then
+
+    #     generator=""
+    #     buildFile="Makefile"
+    #     buildTool="make"
+    #     if [ $__UseNinja == 1 ]; then
+    #         generator="ninja"
+    #         buildFile="build.ninja"
+    #         buildTool="ninja"
+    #     fi
+
+    #     # Regenerate the CMake solution
+    #     echo "Generating native test components"
+    #     cd "$__NativeTestIntermediateDir"
+    #     echo "Invoking \"$__ProjectRoot/src/pal/tools/gen-buildsys-clang.sh\" \"$__ProjectRoot/tests\" $__ClangMajorVersion $__ClangMinorVersion $__BuildArch $__BuildType $__CodeCoverage $__IncludeTests $generator $__cmakeargs"
+    #     "$__ProjectRoot/src/pal/tools/gen-buildsys-clang.sh" "$__ProjectRoot/tests" $__ClangMajorVersion $__ClangMinorVersion $__BuildArch $__BuildType $__CodeCoverage $generator $__IncludeTests "$__cmakeargs"
+    #     cd "$__ProjectDir"        
+    # fi
+
+    # Invoke MSBuild
+    # TODO: Add support for crossgen, ILAsmRoundTrip, TestPriority
+    echo "Generating managed test components"
+    $__ProjectRoot/Tools/corerun "$__MSBuildPath" /nologo "$__ProjectRoot/tests/build.proj" /verbosity:minimal "/fileloggerparameters:Verbosity=normal;LogFile=$__LogsDir/TestBuild_$__BuildOS__$__BuildArch__$__BuildType.log" /t:Build /p:__BuildOS=$__BuildOS /p:__BuildArch=$__BuildArch /p:__BuildType=$__BuildType /p:__BinDir=$__BinDir /p:__IntermediatesDir=$__IntermediatesDir /p:UseRoslynCompiler=true /p:BuildNugetPackage=false /p:UseSharedCompilation=false
+
+    if [ $? -ne 0 ]; then
+        echo "Failed to build tests."
+        exit 1
+    fi
+
+    echo "Test build successfully completed."
 }
 
 generate_NugetPackages()
@@ -385,6 +443,7 @@ __ConfigureOnly=0
 __SkipConfigure=0
 __SkipCoreCLR=0
 __SkipMSCorLib=0
+__SkipTests=0
 __CleanBuild=0
 __VerboseBuild=0
 __CrossBuild=0
@@ -474,6 +533,7 @@ while :; do
             __ConfigureOnly=1
             __SkipCoreCLR=1
             __SkipMSCorLib=1
+            __SkipTests=1
             __IncludeTests=
             ;;
 
@@ -500,6 +560,7 @@ while :; do
 
         skiptests)
             __IncludeTests=
+            __SkipTests=1
             ;;
 
         cmakeargs)
@@ -532,9 +593,12 @@ initDistroName
 __BinDir="$__RootBinDir/Product/$__BuildOS.$__BuildArch.$__BuildType"
 __PackagesBinDir="$__BinDir/.nuget"
 __ToolsDir="$__RootBinDir/tools"
-__TestWorkingDir="$__RootBinDir/tests/$__BuildOS.$__BuildArch.$__BuildType"
 export __IntermediatesDir="$__RootBinDir/obj/$__BuildOS.$__BuildArch.$__BuildType"
-__TestIntermediatesDir="$__RootBinDir/tests/obj/$__BuildOS.$__BuildArch.$__BuildType"
+__TestRootDir="$__RootBinDir/tests"
+__TestBinDir="$__TestRootDir/$__BuildOS.$__BuildArch.$__BuildType"
+__TestIntermediateDir="$__TestRootDir/obj/$__BuildOS.$__BuildArch.$__BuildType"
+__NativeTestIntermediateDir="$__TestIntermediateDir/Native"
+__ManagedTestIntermediateDir="$__TestIntermediateDir/Managed"
 __isMSBuildOnNETCoreSupported=0
 
 # Init if MSBuild for .NET Core is supported for this platform
@@ -579,6 +643,9 @@ setup_dirs
 # Check prereqs.
 
 check_prereqs
+
+build_tests
+exit 1
 
 # Build the coreclr (native) components.
 
